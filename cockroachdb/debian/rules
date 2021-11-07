@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-DISTRIBUTION = $(shell awk -F= '/^VERSION_CODENAME=/{ print $2 }' /etc/os-release)
+DISTRIBUTION = $(shell awk -F= '/^VERSION_CODENAME=/{ print $$2 }' /etc/os-release)
 VERSION = 21.1.11
 PACKAGEVERSION = $(VERSION)-0~$(DISTRIBUTION)0
 TARBALL = cockroach-v$(VERSION).src.tgz
@@ -11,21 +11,25 @@ GO_TARBALL_URL = https://dl.google.com/go/go$(GO_VERSION).linux-amd64.tar.gz
 GO_TARBALL_DEST = /tmp/go.tgz
 
 %:
-    dh $@
+	dh $@
+
+
+export GOCACHE=/tmp/gocache
+export PATH := /usr/local/go/bin:$(PATH)
 
 override_dh_auto_clean:
 override_dh_auto_test:
 override_dh_auto_build:
 override_dh_auto_install:
-    curl -sL -o $(GO_TARBALL_DEST) $(GO_TARBALL_URL)
-    tar -C /usr/local -zxf /tmp/go.tgz
-    rm /tmp/go.tgz
+	curl -sL -o $(GO_TARBALL_DEST) $(GO_TARBALL_URL)
+	tar -C /usr/local -zxf /tmp/go.tgz
+	rm /tmp/go.tgz
 
-    curl -O $(TARBALL_URL)
-    tar -zxf $(TARBALL)
-    cd cockroach-v$(VERSION)
-    make build
-    # make install DESTDIR=debian/cockroachdb
+	curl -O $(TARBALL_URL)
+	tar -zxf $(TARBALL)
+	cd cockroach-v$(VERSION)
+	$(MAKE) -C cockroach-v$(VERSION) build prefix=/opt/cockroachdb
+	$(MAKE) -C cockroach-v$(VERSION) install prefix=/opt/cockroachdb DESTDIR=$(CURDIR)/debian/cockroachdb
 
 override_dh_gencontrol:
-    dh_gencontrol -- -v$(PACKAGEVERSION)
+	dh_gencontrol -- -v$(PACKAGEVERSION)

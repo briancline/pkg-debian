@@ -4,8 +4,10 @@ Build-Depends: debhelper (>= 11),
                build-essential,
                clang,
                llvm,
+               ccache,
                autoconf,
                cmake,
+               bison,
                curl,
                git
 
