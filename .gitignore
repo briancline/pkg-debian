@@ -1,0 +1,12 @@
+*.deb
+*.buildinfo
+*.changes
+*.log
+*.substvars
+.debhelper/
+debhelper-build-stamp
+
+*.tar.gz
+*.tgz
+*.tar.bz2
+*.tbz2
