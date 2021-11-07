@@ -1,0 +1,14 @@
+Source: cockroachdb
+Maintainer: Brian Cline <brian.cline@gmail.com>
+Build-Depends: debhelper (>= 11),
+               build-essential,
+               clang,
+               llvm,
+               autoconf,
+               cmake,
+               curl,
+               git
+
+Package: cockroachdb
+Architecture: any
+Description: distributed, scalable, transactional datastore with SQL compatibility and geo replication
