@@ -5,7 +5,7 @@ VERSION = 2.1.4
 PACKAGEVERSION = $(VERSION)-0~$(DISTRIBUTION)0
 TARBALL = v$(VERSION).tar.gz
 TARBALL_URL = https://github.com/gotify/server/archive/refs/tags/$(TARBALL)
-BUILDDATE = $(shell date "+%F-%T")
+BUILDDATE = $(shell date -Is)
 
 %:
 	dh $@
