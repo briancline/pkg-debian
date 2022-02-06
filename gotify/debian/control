@@ -1,0 +1,11 @@
+Source: gotify-server
+Maintainer: Brian Cline <brian.cline@gmail.com>
+Build-Depends: debhelper (>= 11), dh-systemd,
+               build-essential, clang, llvm, make, pkg-config,
+               curl,
+               git
+
+Package: gotify-server
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}, adduser
+Description: simple REST-based API and UI for sending and receiving messages in real time.

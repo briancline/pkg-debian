@@ -1,0 +1,4 @@
+opt/gotify/plugins
+etc/gotify
+var/lib/gotify
+var/lib/gotify/images

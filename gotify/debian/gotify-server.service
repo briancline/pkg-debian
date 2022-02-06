@@ -1,0 +1,18 @@
+[Unit]
+Description=Gotify push notification server
+Requires=network.target
+
+[Service]
+Type=notify
+WorkingDirectory=/var/lib/gotify
+ExecStart=/opt/gotify/bin/gotify-server
+TimeoutStopSec=60
+Restart=on-failure
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=gotify
+User=gotify
+
+[Install]
+WantedBy=default.target

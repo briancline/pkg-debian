@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    configure)
+        adduser --quiet --system --group --disabled-password --disabled-login --no-create-home --home /var/lib/gotify gotify
+
+        chmod 755 /etc/gotify
+        chmod 600 /etc/gotify/config.yml
+        chmod 700 /var/lib/gotify
+        chown -R gotify:gotify /var/lib/gotify /etc/gotify
+        ;;
+
+esac
+
+#DEBHELPER#
+
+exit 0

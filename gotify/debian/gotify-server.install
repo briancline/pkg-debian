@@ -1,0 +1,2 @@
+server/gotify-server opt/gotify/bin
+server/config.yml etc/gotify

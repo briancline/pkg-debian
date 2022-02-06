@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+
+DISTRIBUTION = $(shell awk -F= '/^VERSION_CODENAME=/{ print $$2 }' /etc/os-release)
+VERSION = 2.1.4
+PACKAGEVERSION = $(VERSION)-0~$(DISTRIBUTION)0
+TARBALL = v$(VERSION).tar.gz
+TARBALL_URL = https://github.com/gotify/server/archive/refs/tags/$(TARBALL)
+BUILDDATE = $(shell date "+%F-%T")
+
+%:
+	dh $@
+
+export GOCACHE=/tmp/gocache
+export PATH := /usr/local/go/bin:$(PATH)
+
+override_dh_auto_install:
+	rm -rf server
+	curl -L -O $(TARBALL_URL)
+	tar -zxf $(TARBALL)
+	mv server-$(VERSION) server
+
+	# Docker:
+	# $(MAKE) -C server-$(VERSION) build-linux-amd64
+
+	# Dockerless:
+	cd server/ui && yarn
+	cd server/ui && yarn build
+	cd server && go run hack/packr/packr.go
+
+	# -X main.Commit=$(shell git rev-parse --verify HEAD)
+	export LD_FLAGS="-w -s -X main.Version=${VERSION} -X main.BuildDate=${BUILDDATE} -X main.Commit=release -X main.Mode=prod";
+	cd server && go build -ldflags="$(LD_FLAGS)" -o gotify-server
+	cp server/config.example.yml server/config.yml
+	sed -i server/config.yml -r -e 's|connection: data/gotify.db|connection: /var/lib/gotify/gotify.db|'
+	sed -i server/config.yml -r -e 's|uploadedimagesdir: data/images|uploadedimagesdir: /var/lib/gotify/images|'
+	sed -i server/config.yml -r -e 's|pluginsdir: data/plugins|pluginsdir: /opt/gotify/plugins|'
+
+override_dh_gencontrol:
+	dh_gencontrol -- -v$(PACKAGEVERSION)
