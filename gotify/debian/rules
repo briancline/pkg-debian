@@ -15,9 +15,8 @@ export PATH := /usr/local/go/bin:$(PATH)
 
 override_dh_auto_install:
 	rm -rf server
-	curl -L -O $(TARBALL_URL)
-	tar -zxf $(TARBALL)
-	mv server-$(VERSION) server
+	git clone git://github.com/gotify/server.git
+	cd server && git checkout v$(VERSION)
 
 	# Docker:
 	# $(MAKE) -C server-$(VERSION) build-linux-amd64
@@ -26,14 +25,18 @@ override_dh_auto_install:
 	cd server/ui && yarn
 	cd server/ui && yarn build
 	cd server && go run hack/packr/packr.go
+	cd server && \
+		go build \
+			-ldflags="-w -s -X main.Version=${VERSION} -X main.BuildDate=${BUILDDATE} -X main.Commit=$(shell cd server && git rev-parse --verify HEAD) -X main.Mode=prod" \
+			-o gotify-server
 
-	# -X main.Commit=$(shell git rev-parse --verify HEAD)
-	export LD_FLAGS="-w -s -X main.Version=${VERSION} -X main.BuildDate=${BUILDDATE} -X main.Commit=release -X main.Mode=prod";
-	cd server && go build -ldflags="$(LD_FLAGS)" -o gotify-server
 	cp server/config.example.yml server/config.yml
-	sed -i server/config.yml -r -e 's|connection: data/gotify.db|connection: /var/lib/gotify/gotify.db|'
-	sed -i server/config.yml -r -e 's|uploadedimagesdir: data/images|uploadedimagesdir: /var/lib/gotify/images|'
-	sed -i server/config.yml -r -e 's|pluginsdir: data/plugins|pluginsdir: /opt/gotify/plugins|'
+	sed -i server/config.yml -r \
+		-e 's|listenaddr: ""|listenaddr: 127.0.0.1|' \
+		-e 's|port: 80|port: 8080|' \
+		-e 's|connection: data/gotify.db|connection: /var/lib/gotify/gotify.db|' \
+		-e 's|uploadedimagesdir: data/images|uploadedimagesdir: /var/lib/gotify/images|' \
+		-e 's|pluginsdir: data/plugins|pluginsdir: /opt/gotify/plugins|'
 
 override_dh_gencontrol:
 	dh_gencontrol -- -v$(PACKAGEVERSION)
