@@ -6,28 +6,18 @@ PACKAGEVERSION = $(VERSION)-0~$(DISTRIBUTION)0
 TARBALL = cockroach-v$(VERSION).src.tgz
 TARBALL_URL = https://binaries.cockroachdb.com/$(TARBALL)
 
-GO_VERSION = 1.16.6
-GO_TARBALL_URL = https://dl.google.com/go/go$(GO_VERSION).linux-amd64.tar.gz
-GO_TARBALL_DEST = /tmp/go.tgz
-
 %:
 	dh $@
-
 
 export GOCACHE=/tmp/gocache
 export PATH := /usr/local/go/bin:$(PATH)
 
-override_dh_auto_clean:
-override_dh_auto_test:
-override_dh_auto_build:
+# override_dh_auto_clean:
+# override_dh_auto_test:
+# override_dh_auto_build:
 override_dh_auto_install:
-	curl -sL -o $(GO_TARBALL_DEST) $(GO_TARBALL_URL)
-	tar -C /usr/local -zxf /tmp/go.tgz
-	rm /tmp/go.tgz
-
 	curl -O $(TARBALL_URL)
 	tar -zxf $(TARBALL)
-	cd cockroach-v$(VERSION)
 	$(MAKE) -C cockroach-v$(VERSION) build prefix=/opt/cockroachdb
 	$(MAKE) -C cockroach-v$(VERSION) install prefix=/opt/cockroachdb DESTDIR=$(CURDIR)/debian/cockroachdb
 
