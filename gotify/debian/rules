@@ -16,17 +16,16 @@ export PATH := /usr/local/go/bin:$(PATH)
 override_dh_auto_install:
 	rm -rf server
 	git clone git://github.com/gotify/server.git --single-branch --branch v$(VERSION)
-	$(eval GITCOMMIT := $(shell cd server && git rev-parse --verify HEAD))
 
-	# Docker:
+	## Docker:
 	# $(MAKE) -C server build-linux-amd64
 
-	# Dockerless:
+	## Dockerless:
 	cd server/ui && yarn
 	cd server/ui && yarn build
 	cd server && go run hack/packr/packr.go
 	cd server && go build \
-		-ldflags="-w -s -X main.Version=${VERSION} -X main.BuildDate=${BUILDDATE} -X main.Commit=${GITCOMMIT} -X main.Mode=prod" \
+		-ldflags="-w -s -X main.Version=$(VERSION) -X main.BuildDate=$(BUILDDATE) -X main.Commit=$$(git rev-parse --verify HEAD) -X main.Mode=prod" \
 		-o gotify-server
 
 	cp server/config.example.yml server/config.yml
