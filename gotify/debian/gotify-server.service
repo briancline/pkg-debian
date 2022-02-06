@@ -3,7 +3,7 @@ Description=Gotify push notification server
 Requires=network.target
 
 [Service]
-Type=notify
+Type=simple
 WorkingDirectory=/var/lib/gotify
 ExecStart=/opt/gotify/bin/gotify-server
 TimeoutStopSec=60
