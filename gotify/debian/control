@@ -1,6 +1,6 @@
 Source: gotify-server
 Maintainer: Brian Cline <brian.cline@gmail.com>
-Build-Depends: debhelper (>= 11), dh-systemd,
+Build-Depends: debhelper (>= 11),
                build-essential, clang, llvm, make, pkg-config,
                curl,
                git
