@@ -8,19 +8,28 @@ export GO_TARBALL_DEST=/tmp/go.tgz
 
 export DEBIAN_FRONTEND=noninteractive
 apt install -q -y --no-install-recommends \
-	ca-certificates software-properties-common gnupg2 \
-	build-essential clang llvm make pkg-config debhelper \
-	curl git rsync
+    ca-certificates software-properties-common gnupg2 \
+    build-essential clang llvm make pkg-config debhelper \
+    curl git rsync
+
+DISTRO="$(lsb_release -is | tr '[[:upper:]]' '[[:lower:]]')"
+DISTRO_CODENAME="$(lsb_release -cs)"
 
 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-sudo apt update -q
-sudo apt install docker-ce -q -y
+echo "deb [arch=amd64] https://download.docker.com/linux/${DISTRO} ${DISTRO_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list
+apt update -q
+apt install -q -y docker-ce
 
 # TODO: just use the upstream docker build to ensure server and plugin binary compatibility
 
+curl -fsSL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+apt update -q
+apt install -q -y nodejs
+
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+apt update -q
+apt install -q -y yarn
 
 curl -sL -o "${GO_TARBALL_DEST}" "${GO_TARBALL_URL}"
 sha256sum -c - <<EOF
